@@ -1,0 +1,35 @@
+{
+  "name": "barcode-app",
+  "version": "1.0.0",
+  "description": "Web app that turns a SKU/MRP/Quantity spreadsheet into a single PDF of 50x25mm barcode labels, one page per unit.",
+  "main": "server.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vimalrajd/barcode-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vimalrajd/barcode-app/issues"
+  },
+  "homepage": "https://github.com/vimalrajd/barcode-app#readme",
+  "dependencies": {
+    "bwip-js": "^4.11.4",
+    "csv-parse": "^7.0.2",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "multer": "^2.3.0",
+    "pdfkit": "^0.20.1"
+  }
+}

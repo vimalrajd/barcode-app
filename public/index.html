@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Barcode Label Generator</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --border: #e0e2e7;
+    --text: #1f2430;
+    --muted: #6b7280;
+    --accent: #2f6fed;
+    --accent-dark: #2456bd;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161c;
+      --card: #1c1f28;
+      --border: #2d313d;
+      --text: #eef0f4;
+      --muted: #9aa0ac;
+      --accent: #5b8dff;
+      --accent-dark: #7ba1ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 32px 16px 64px;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  p.sub { color: var(--muted); margin-top: 0; font-size: 0.95rem; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  label { display: block; font-size: 0.85rem; color: var(--muted); margin: 12px 0 6px; }
+  input[type="file"], input[type="url"], input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+  button.primary {
+    margin-top: 18px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  button.primary:not(:disabled):hover { background: var(--accent-dark); }
+  .status { margin-top: 14px; font-size: 0.9rem; min-height: 1.2em; }
+  .status.error { color: #d64545; }
+  .status.ok { color: #1a9e5c; }
+  .hint { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+  .preview-card {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .label-preview {
+    width: 300px;
+    aspect-ratio: 2 / 1;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: #fff;
+    color: #3d3d3d;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  .label-preview .price { font-size: 1.4rem; font-weight: bold; }
+  .label-preview .bars { font-size: 1.6rem; letter-spacing: 1px; line-height: 0.6; margin: 6px 0; }
+  .label-preview .sku { font-size: 1.1rem; font-weight: bold; border-top: 1px solid #ccc; padding-top: 4px; margin-top: 2px; width: 100%; }
+  .label-preview .footer { font-size: 0.55rem; margin-top: 2px; }
+  footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 28px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Barcode Label Generator</h1>
+  <p class="sub">Upload or link a spreadsheet with SKU, MRP and Quantity columns. Get back one PDF with a 50&times;25mm label page per unit &mdash; quantity 5 means 5 pages for that SKU.</p>
+
+  <div class="card">
+    <div class="tabs">
+      <button type="button" class="tab-btn active" data-tab="upload">Upload file</button>
+      <button type="button" class="tab-btn" data-tab="url">Paste a link</button>
+    </div>
+
+    <div id="panel-upload" class="panel active">
+      <label for="file">Excel or CSV file (.xlsx, .xls, .csv)</label>
+      <input type="file" id="file" accept=".xlsx,.xls,.csv" />
+    </div>
+
+    <div id="panel-url" class="panel">
+      <label for="url">Spreadsheet link</label>
+      <input type="url" id="url" placeholder="https://docs.google.com/spreadsheets/... or a direct .xlsx/.csv link" />
+      <p class="hint">Google Sheets links (published or shared) are supported automatically.</p>
+    </div>
+
+    <label for="companyLine">Footer text on every label (optional)</label>
+    <input type="text" id="companyLine" placeholder="contact@example.com | Address line, City, State, PIN" maxlength="300" />
+
+    <button type="button" class="primary" id="generateBtn">Generate PDF</button>
+    <div id="status" class="status"></div>
+  </div>
+
+  <div class="preview-card">
+    <div class="label-preview">
+      <div class="price">RS. 249</div>
+      <div class="bars">|||‖|||‖||‖|||‖|||‖||‖|||</div>
+      <div class="sku">PET258WHE002</div>
+      <div class="footer">contact@example.com | Sample Address Line, City, ST, 000000</div>
+    </div>
+  </div>
+
+  <footer>Labels are generated at 50mm &times; 25mm, one page per unit, matching the sample layout above.</footer>
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = { upload: document.getElementById('panel-upload'), url: document.getElementById('panel-url') };
+  tabs.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      tabs.forEach((b) => b.classList.remove('active'));
+      Object.values(panels).forEach((p) => p.classList.remove('active'));
+      btn.classList.add('active');
+      panels[btn.dataset.tab].classList.add('active');
+    });
+  });
+
+  const statusEl = document.getElementById('status');
+  const btn = document.getElementById('generateBtn');
+
+  function setStatus(msg, kind) {
+    statusEl.textContent = msg || '';
+    statusEl.className = 'status' + (kind ? ' ' + kind : '');
+  }
+
+  async function downloadPdfFromResponse(resp) {
+    const blob = await resp.blob();
+    const count = resp.headers.get('X-Label-Count');
+    const dlUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = dlUrl;
+    a.download = 'barcode-labels.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(dlUrl), 10000);
+    setStatus(count ? `Done - PDF with ${count} label page(s) downloaded.` : 'Done - PDF downloaded.', 'ok');
+  }
+
+  btn.addEventListener('click', async () => {
+    const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+    const companyLine = document.getElementById('companyLine').value;
+
+    btn.disabled = true;
+    setStatus('Generating PDF...');
+
+    try {
+      let resp;
+      if (activeTab === 'upload') {
+        const fileInput = document.getElementById('file');
+        if (!fileInput.files.length) throw new Error('Please choose a file first.');
+        const form = new FormData();
+        form.append('file', fileInput.files[0]);
+        form.append('companyLine', companyLine);
+        resp = await fetch('/api/generate/upload', { method: 'POST', body: form });
+      } else {
+        const url = document.getElementById('url').value.trim();
+        if (!url) throw new Error('Please paste a spreadsheet link first.');
+        resp = await fetch('/api/generate/url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, companyLine }),
+        });
+      }
+
+      if (!resp.ok) {
+        let message = 'Failed to generate the PDF.';
+        try {
+          const data = await resp.json();
+          if (data && data.error) message = data.error;
+        } catch (_) {}
+        throw new Error(message);
+      }
+
+      await downloadPdfFromResponse(resp);
+    } catch (err) {
+      setStatus(err.message || 'Something went wrong.', 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
