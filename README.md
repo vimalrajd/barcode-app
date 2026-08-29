@@ -1,7 +1,7 @@
 # Barcode Label Generator
 
 Turns a spreadsheet of `SKU`, `MRP`, and `Quantity` into a single PDF of
-50mm x 25mm barcode labels — one page per unit, so a row with quantity 5
+50mm x 20mm barcode labels — one page per unit, so a row with quantity 5
 produces 5 pages for that SKU.
 
 Each label matches this layout:
