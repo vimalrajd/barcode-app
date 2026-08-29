@@ -49,6 +49,27 @@ on failure.
 This is a stateless Node/Express app with no database — it works on any
 Node host (Render, Railway, Fly.io, a VM, etc.) or as a container.
 
+### Docker image (built automatically by CI)
+
+Every push to `main` builds and publishes a Docker image to GitHub
+Container Registry via `.github/workflows/docker-publish.yml` — no extra
+secrets required, it uses the repo's built-in `GITHUB_TOKEN`.
+
+```bash
+docker pull ghcr.io/vimalrajd/barcode-app:latest
+docker run -p 3000:3000 ghcr.io/vimalrajd/barcode-app:latest
+```
+
+The package is published under the repository's **Packages** tab on
+GitHub. If the package is private, make it public (or `docker login
+ghcr.io` first) before pulling it on your host.
+
+To point any Node host or PaaS (Render, Railway, Fly.io, a VM, etc.) at
+this app, just have it run that image (most platforms accept a container
+registry image directly — no separate build step needed).
+
+### Building locally
+
 ```bash
 docker build -t barcode-app .
 docker run -p 3000:3000 barcode-app
