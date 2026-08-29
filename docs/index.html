@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barcode Label Creator</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  </head>
+  <body>
+    <main class="app">
+      <section class="controls">
+        <h1>Thermal Barcode Label</h1>
+
+        <label for="barcodeInput">Barcode value</label>
+        <input id="barcodeInput" type="text" value="PET258WHE002" maxlength="40" />
+
+        <label for="textInput">Text inside barcode</label>
+        <input id="textInput" type="text" value="PET258WHE002" maxlength="40" />
+
+        <label for="mrpInput">MRP</label>
+        <input id="mrpInput" type="text" value="Rs. 150" maxlength="30" />
+
+        <label class="checkbox-row">
+          <input id="showTextInBarcode" type="checkbox" />
+          Show text in barcode
+        </label>
+
+        <div class="actions">
+          <button id="generateBtn" type="button">Generate</button>
+          <button id="printBtn" class="secondary" type="button">Print Label</button>
+        </div>
+      </section>
+
+      <section class="label-wrapper">
+        <div id="label" class="label" aria-label="Barcode label preview">
+          <div class="meta-row">
+            <span class="top-line">MRP: Rs. 150</span>
+          </div>
+          <svg id="barcode" class="barcode"></svg>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
