@@ -44,44 +44,6 @@ header reports the total number of label pages produced.
 Both return `application/pdf` on success or `{ "error": "..." }` (HTTP 400)
 on failure.
 
-## Gyroscope angle visualizer (MPU6050 + Arduino)
-
-`public/gyro.html` (linked from the home page) is a standalone page that
-shows a live 3D view of an Arduino + MPU6050's orientation, read straight
-from USB serial in the browser via the [Web Serial
-API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API) &mdash;
-no drivers, backend, or extra install required.
-
-It expects the Arduino sketch to print lines in this format (115200 baud):
-
-```
-Angle from origin -> X: 12.34  Y: -3.21  Z: 45.00 (deg)
-```
-
-which is exactly what a standard complementary-filter MPU6050 sketch
-(gyro + accel fused for roll/pitch, gyro-only integration for yaw) prints.
-
-**To run it:**
-
-1. Wire the MPU6050 to the Arduino: `VCC`&rarr;5V (or 3.3V, check your
-   board), `GND`&rarr;GND, `SCL`&rarr;`SCL`/`A5`, `SDA`&rarr;`SDA`/`A4`.
-2. Upload your sketch via the Arduino IDE, then **close the Serial
-   Monitor** &mdash; only one program can hold the serial port open at a
-   time, and the web page needs it.
-3. Start this app (`npm start`) and open http://localhost:3000/gyro.html
-   in **Chrome or Edge** (Web Serial isn't supported in Firefox/Safari).
-4. Click **Connect to Arduino**, pick the Arduino's port from the browser
-   prompt, and confirm the baud rate matches the sketch's `Serial.begin(...)`
-   (115200 by default).
-5. Tilt the sensor &mdash; the 3D board and the live X/Y/Z readouts should
-   track it. Yaw (Z) will drift slowly since it's pure gyro integration
-   with no accelerometer reference; use **Set current as zero** to
-   re-baseline any axis without resetting the board.
-
-The page also works opened directly as a file, but serving it from this
-app (or any localhost/HTTPS origin) is the more reliable option since some
-browsers restrict Web Serial on plain `file://` pages.
-
 ## Deployment
 
 This is a stateless Node/Express app with no database — it works on any
